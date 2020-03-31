@@ -10,7 +10,7 @@
         },
         "interactionModel": {
           "en-US": {
-            "eTag": "bdf89e629d32ce38514ac62ba767456f"
+            "eTag": "f57357f9ba29fc371856e6cd86eecad8"
           }
         },
         "lambda": [
@@ -23,7 +23,7 @@
             "codeUri": "lambda/us-east-1_ask-custom-Corona_Time-default",
             "functionName": "ask-custom-Corona_Time-default",
             "handler": "lambda_function.lambda_handler",
-            "revisionId": "b01432f6-89b0-44dd-aa68-705f1c425e7d",
+            "revisionId": "b989dacc-92de-4035-b8b9-ad8e61a34161",
             "runtime": "python3.6"
           }
         ]

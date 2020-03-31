@@ -1,4 +1,5 @@
 import logging
+
 from ask_sdk_core.handler_input import HandlerInput
 from ask_sdk_core.skill_builder import SkillBuilder
 from ask_sdk_core.utils import is_request_type, is_intent_name
@@ -8,7 +9,7 @@ from business_logic import get_data_for_country
 
 skill_name = "Corona Time"
 help_text = ("Please tell me a country name. You can say "
-    "give me data for Canada")
+             "give me data for Canada")
 
 country_slot_key = "COUNTRY"
 country_slot = "Country"
@@ -19,59 +20,59 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 
-@sb.request_handler(can_handle_func = is_request_type("LaunchRequest"))
+@sb.request_handler(can_handle_func=is_request_type("LaunchRequest"))
 def launch_request_handler(handler_input):
-    "Handler for Skill Launch."
-    # type: (HandlerInput) -> Response
+    """Handler for Skill Launch."""
+    # type: HandlerInput -> Response
     speech = "Welcome to the Corona Time skill."
 
-    handler_input.response_builder\
-        .speak(speech + " " + help_text)\
+    handler_input.response_builder \
+        .speak(speech + " " + help_text) \
         .ask(help_text)
 
     return handler_input.response_builder.response
 
 
-@sb.request_handler(can_handle_func = is_intent_name("AMAZON.HelpIntent"))
+@sb.request_handler(can_handle_func=is_intent_name("AMAZON.HelpIntent"))
 def help_intent_handler(handler_input):
-    "Handler for Help Intent."
-    # type: (HandlerInput) -> Response
-    handler_input.response_builder\
-        .speak(help_text)\
+    """Handler for Help Intent."""
+    # type: HandlerInput -> Response
+    handler_input.response_builder \
+        .speak(help_text) \
         .ask(help_text)
 
     return handler_input.response_builder.response
 
 
 @sb.request_handler(
-    can_handle_func = lambda handler_input:
-        is_intent_name("AMAZON.CancelIntent")(handler_input) or
-        is_intent_name("AMAZON.StopIntent")(handler_input)
-    )
+    can_handle_func=lambda handler_input:
+    is_intent_name("AMAZON.CancelIntent")(handler_input) or
+    is_intent_name("AMAZON.StopIntent")(handler_input)
+)
 def cancel_and_stop_intent_handler(handler_input):
-    "Single handler for Cancel and Stop Intent."
-    # type: (HandlerInput) -> Response
+    """Single handler for Cancel and Stop Intent."""
+    # type: HandlerInput -> Response
     speech_text = "Goodbye!"
 
-    handler_input.response_builder\
+    handler_input.response_builder \
         .speak(speech_text)
 
     return handler_input.response_builder.response
 
 
-@sb.request_handler(can_handle_func = is_request_type("SessionEndedRequest"))
+@sb.request_handler(can_handle_func=is_request_type("SessionEndedRequest"))
 def session_ended_request_handler(handler_input):
-    "Handler for Session End."
-    # type: (HandlerInput) -> Response
+    """Handler for Session End."""
+    # type: HandlerInput -> Response
     return handler_input.response_builder.response
 
 
-@sb.request_handler(can_handle_func = is_intent_name("GiveDataIntent"))
+@sb.request_handler(can_handle_func=is_intent_name("GiveDataIntent"))
 def give_data_handler(handler_input):
     """Check if country is provided in slot values. If provided, then
         give data about that country. If not, then it asks user to provide
         the country again."""
-    # type: (HandlerInput) -> Response
+    # type: HandlerInput -> Response
     slots = handler_input.request_envelope.request.intent.slots
 
     if country_slot in slots:
@@ -84,64 +85,64 @@ def give_data_handler(handler_input):
     else:
         speech = "I'm not sure what country you said, please try again"
 
-    handler_input.response_builder\
+    handler_input.response_builder \
         .speak(speech)
 
     return handler_input.response_builder.response
 
 
-@sb.request_handler(can_handle_func = is_intent_name("AMAZON.FallbackIntent"))
+@sb.request_handler(can_handle_func=is_intent_name("AMAZON.FallbackIntent"))
 def fallback_handler(handler_input):
     """AMAZON.FallbackIntent is only available in en-US locale.
         This handler will not be triggered except in that locale,
         so it is safe to deploy on any locale."""
-    # type: (HandlerInput) -> Response
+    # type: HandlerInput -> Response
     speech = ("The {} skill can't help you with that. "
-        "You can tell me the country by saying, "
-        "give me data for Canada").format(skill_name)
+              "You can tell me the country by saying, "
+              "give me data for Canada").format(skill_name)
     reprompt = ("You can tell me the country by saying, "
-        "give me data for Canada")
+                "give me data for Canada")
 
-    handler_input.response_builder\
-        .speak(speech)\
+    handler_input.response_builder \
+        .speak(speech) \
         .ask(reprompt)
 
     return handler_input.response_builder.response
 
 
 def convert_speech_to_text(ssml_speech):
-    "convert ssml speech to text, by removing html tags."
-    # type: (str) -> str
+    """convert ssml speech to text, by removing html tags."""
+    # type: str -> str
     s = SSMLStripper()
     s.feed(ssml_speech)
     return s.get_data()
 
 
 @sb.global_response_interceptor()
-def add_card(handler_input, response):
-    "Add a card by translating ssml text to card content."
+def add_card(response):
+    """Add a card by translating ssml text to card content."""
     # type: (HandlerInput, Response) -> None
     response.card = SimpleCard(
-        title = skill_name,
-        content = convert_speech_to_text(response.output_speech.ssml)
+        title=skill_name,
+        content=convert_speech_to_text(response.output_speech.ssml)
     )
 
 
 @sb.global_response_interceptor()
-def log_response(handler_input, response):
-    "Log response from alexa service."
+def log_response(response):
+    """Log response from alexa service."""
     # type: (HandlerInput, Response) -> None
     print("Alexa Response: {}\n".format(response))
 
 
 @sb.global_request_interceptor()
 def log_request(handler_input):
-    "Log request to alexa service."
-    # type: (HandlerInput) -> None
+    """Log request to alexa service."""
+    # type: HandlerInput -> None
     print("Alexa Request: {}\n".format(handler_input.request_envelope.request))
 
 
-@sb.exception_handler(can_handle_func = lambda i, e: True)
+@sb.exception_handler(can_handle_func=lambda i, e: True)
 def all_exception_handler(handler_input, exception):
     """Catch all exception handler, log exception and
     respond with custom message."""
@@ -150,8 +151,8 @@ def all_exception_handler(handler_input, exception):
 
     speech = "Sorry, there was some problem. Please try again!"
 
-    handler_input.response_builder\
-        .speak(speech)\
+    handler_input.response_builder \
+        .speak(speech) \
         .ask(speech)
 
     return handler_input.response_builder.response
@@ -182,6 +183,7 @@ class SSMLStripper(HTMLParser):
 
     def get_data(self):
         return ''.join(self.full_str_list)
+
 
 ################################################
 
