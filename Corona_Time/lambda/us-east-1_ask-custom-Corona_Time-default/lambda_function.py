@@ -121,7 +121,7 @@ def convert_speech_to_text(ssml_speech):
 @sb.global_response_interceptor()
 def add_card(response):
     """Add a card by translating ssml text to card content."""
-    # type: (HandlerInput, Response) -> None
+    # type: Response -> None
     response.card = SimpleCard(
         title=skill_name,
         content=convert_speech_to_text(response.output_speech.ssml)
