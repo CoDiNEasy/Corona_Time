@@ -99,7 +99,7 @@ def fallback_handler(handler_input):
     # type: HandlerInput -> Response
     speech = ("The {} skill can't help you with that. "
               "You can tell me the country by saying, "
-              "give me data for Canada").format(skill_name)
+              "give me data for Canada".format(skill_name))
     reprompt = ("You can tell me the country by saying, "
                 "give me data for Canada")
 
@@ -115,13 +115,14 @@ def convert_speech_to_text(ssml_speech):
     # type: str -> str
     s = SSMLStripper()
     s.feed(ssml_speech)
+
     return s.get_data()
 
 
 @sb.global_response_interceptor()
-def add_card(response):
+def add_card(handler_input, response):
     """Add a card by translating ssml text to card content."""
-    # type: Response -> None
+    # type: (HandlerInput, Response) -> None
     response.card = SimpleCard(
         title=skill_name,
         content=convert_speech_to_text(response.output_speech.ssml)
@@ -129,7 +130,7 @@ def add_card(response):
 
 
 @sb.global_response_interceptor()
-def log_response(response):
+def log_response(handler_input, response):
     """Log response from alexa service."""
     # type: (HandlerInput, Response) -> None
     print("Alexa Response: {}\n".format(response))
@@ -164,6 +165,7 @@ def all_exception_handler(handler_input, exception):
 # what you want to use.
 
 from six import PY2
+
 try:
     from HTMLParser import HTMLParser
 except ImportError:
