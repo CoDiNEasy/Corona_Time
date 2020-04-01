@@ -5,7 +5,7 @@ from ask_sdk_core.skill_builder import SkillBuilder
 from ask_sdk_core.utils import is_request_type, is_intent_name
 from ask_sdk_model import Response
 from ask_sdk_model.ui import SimpleCard
-from business_logic import get_data_for_country
+from business_logic_json import get_data_for_country
 
 skill_name = "Corona Time"
 help_text = ("Please tell me a country name. You can say "
@@ -79,9 +79,9 @@ def give_data_handler(handler_input):
         cur_country = slots[country_slot].value
         handler_input.attributes_manager.session_attributes[country_slot_key] = cur_country
 
-        num_cases = get_data_for_country(cur_country)
+        output = get_data_for_country(cur_country)
 
-        speech = "{} has {} confirmed cases of the Corona virus.".format(cur_country, num_cases)
+        speech = output
     else:
         speech = "I'm not sure what country you said, please try again"
 
